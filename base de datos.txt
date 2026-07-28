@@ -1,0 +1,124 @@
+DROP DATABASE IF EXISTS eden;
+CREATE DATABASE eden CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE eden;
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+CREATE TABLE `empleados` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `sueldo_base` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `sucursal_id` int(11) NOT NULL,
+  `activo` tinyint(1) DEFAULT 1,
+  `fecha_ingreso` date DEFAULT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `empleados` (`id`, `nombre`, `sueldo_base`, `sucursal_id`, `activo`, `fecha_ingreso`, `fecha_creacion`) VALUES
+(2, 'shirley yomali jimenez mollinedo', 3000.00, 10, 1, NULL, '2025-12-21 00:56:36'),
+(3, 'Miguel Angel Hernandez Garcia', 2800.00, 10, 1, NULL, '2025-12-21 00:56:36'),
+(4, 'Edgar Frias Ramos', 2300.00, 10, 1, NULL, '2025-12-21 00:56:36'),
+(5, 'Jazmin Garcia De La Cruz', 1600.00, 10, 1, NULL, '2025-12-21 00:56:36'),
+(6, 'francisco calix montejo', 3000.00, 10, 1, NULL, '2025-12-21 00:56:36'),
+(7, 'Carlos Arturo Sanchez Magana', 2500.00, 11, 1, NULL, '2025-12-21 00:56:45'),
+(8, 'Ernesto D.l Lopez Juarez', 3000.00, 11, 1, NULL, '2025-12-21 00:56:45'),
+(9, 'Paulina del C. Marin Lopez', 2350.00, 11, 1, NULL, '2025-12-21 00:56:45'),
+(10, 'Abrahan Laguna Fonseca', 2600.00, 11, 1, NULL, '2025-12-21 00:56:45'),
+(11, 'Juan Ricardo Magaña Padilla', 3500.00, 11, 1, NULL, '2025-12-21 00:56:45'),
+(12, 'Lucio Lopez Jimenez', 1800.00, 11, 1, NULL, '2025-12-21 00:56:45'),
+(13, 'Galacion de la Cruz Arias', 3000.00, 11, 1, NULL, '2025-12-21 00:56:45'),
+(14, 'yastbereri guadalupe aldama garcia', 1800.00, 11, 1, NULL, '2025-12-21 00:56:45'),
+(15, 'Monserrat Cruz Gonzalez', 1800.00, 11, 1, NULL, '2025-12-21 00:56:45'),
+(16, 'Aracely luciano raymundo', 1960.00, 12, 1, NULL, '2025-12-21 00:57:00'),
+(17, 'Denia I. Lopez Jimenez', 2000.00, 12, 1, NULL, '2025-12-21 00:57:00'),
+(18, 'Lorenza Arias Mendez', 2000.00, 12, 1, NULL, '2025-12-21 00:57:00'),
+(19, 'Fernando Hernandez Hernandez', 3000.00, 12, 1, NULL, '2025-12-21 00:57:00'),
+(20, 'Ignacio subiaur garcia', 2500.00, 12, 1, NULL, '2025-12-21 00:57:00'),
+(21, 'Carolina Ricardez Soberano', 2600.00, 12, 1, NULL, '2025-12-21 00:57:00'),
+(22, 'Enry De Jesus Lazaro Garcia', 2000.00, 12, 1, NULL, '2025-12-21 00:57:00'),
+(23, 'Miguel  Antonio Lopez Triano', 2100.00, 12, 1, NULL, '2025-12-21 00:57:00'),
+(24, 'Asuncion Miguel Soberano Dominguez', 2900.00, 12, 1, NULL, '2025-12-21 00:57:00'),
+(25, 'Jhoan Eduardo Jimenez Javier', 2600.00, 12, 1, NULL, '2025-12-21 00:57:00'),
+(26, 'Maria Eliza Lopez Arias', 1800.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(27, 'Cristian Leonicio Almeida', 2500.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(28, 'Guadalupe de los Santos Jimenez', 2500.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(29, 'Ignacio Lopez Garcia', 2600.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(30, 'Ismael Alvarez Quiroga', 2600.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(31, 'LitziI Sarai Tarcena Segovia', 1800.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(32, 'LIzbeth B.  lopez lopez', 2000.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(33, 'Pablo  Lopez Cardona', 2400.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(34, 'Petrona Badal Triano', 2000.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(35, 'Winder Francisco Lopez', 2200.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(36, 'Betsy Isamar Naranjo Avalo', 1960.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(37, 'Alexander Jimenez Javier', 2100.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(38, 'Erick Alberto Reyes Graniel', 3500.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(39, 'Maria Isabel Hernandez Alejandro', 1800.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(40, 'Jose Miguel Contreras Dominguez', 2200.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(41, 'Juan Zapata Castillo', 2600.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(42, 'Luis  Alberto De La O Guillermo', 2000.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(43, 'Humberto Martinez Torres', 2600.00, 13, 1, NULL, '2025-12-21 00:57:12'),
+(44, 'Andres Cruz Bautista', 2500.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(45, 'loysi del carmen hernandez gonzalez', 2200.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(46, 'susana rubi hernandez sanchez', 2350.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(47, 'Daniel Calix Montejo', 2200.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(48, 'Maria Felix del Rosario Martinez Lopez', 2100.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(49, 'Jose Luis Flores Hernandez', 2200.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(50, 'Dayana Guadalupe Cornelio Alvarado', 1960.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(51, 'Domitilo Lopez Mayo', 3300.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(52, 'Carlos Agusto Sanchez Zapata', 3000.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(53, 'luisa fernanda cocom acencio', 2000.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(54, 'Yaricsa Ramirez Arias', 1800.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(55, 'jorge luis cupido sanchez', 2100.00, 14, 1, NULL, '2025-12-21 00:57:20'),
+(56, 'Alejandro Diaz Gonzalez', 2500.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(57, 'elizabe alvarado lopez', 1960.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(58, 'juan manuel landero lopez', 2900.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(59, 'Addy Guadalupe Sosa Javier', 2350.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(60, 'willian hernandez rios', 2200.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(61, 'Emanuel reyez solis', 2500.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(62, 'jesus mendez gomez', 2200.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(63, 'Alberto Salvador León', 3500.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(64, 'Carlos Arturo Herandez Feria', 2700.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(65, 'Jaime Perez Chanona', 3500.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(66, 'Elvia leticia hernandez poot', 1960.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(67, 'Maria elizabeth lopez vicaña', 1800.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(68, 'Rosario Arias Mendez', 2700.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(69, 'dayana del carmen ramon solis', 1960.00, 15, 1, NULL, '2025-12-21 00:57:40'),
+(70, 'Milagros de los A. Hernandez Poot', 1800.00, 15, 1, NULL, '2025-12-21 00:57:40');
+
+CREATE TABLE `sucursales` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `direccion` varchar(255) DEFAULT NULL,
+  `telefono` varchar(20) DEFAULT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `sucursales` (`id`, `nombre`, `direccion`, `telefono`, `fecha_creacion`) VALUES
+(10, 'CEDIS', NULL, NULL, '2025-12-21 00:56:11'),
+(11, 'CEDRO', NULL, NULL, '2025-12-21 00:56:11'),
+(12, 'JM', NULL, NULL, '2025-12-21 00:56:11'),
+(13, 'JP', NULL, NULL, '2025-12-21 00:56:11'),
+(14, 'POMOCA_SEC', NULL, NULL, '2025-12-21 00:56:11'),
+(15, 'VALLE', NULL, NULL, '2025-12-21 00:56:11');
+
+ALTER TABLE `empleados`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_sucursal` (`sucursal_id`),
+  ADD KEY `idx_activo` (`activo`);
+
+ALTER TABLE `sucursales`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `nombre` (`nombre`);
+
+ALTER TABLE `empleados`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+
+ALTER TABLE `sucursales`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+ALTER TABLE `empleados`
+  ADD CONSTRAINT `empleados_ibfk_1` FOREIGN KEY (`sucursal_id`) REFERENCES `sucursales` (`id`) ON UPDATE CASCADE;
+
+COMMIT;
