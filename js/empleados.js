@@ -1,50 +1,42 @@
 /**
  * empleados.js
- * Responsabilidad: todo lo relacionado con empleados.
- * Depende de: API (api.js), Sucursales (sucursales.js)
  */
 const Empleados = {
-
-    /** Cache local */
-    lista: [],
-
-    // ── Carga y render ──────────────────────────────────────────
-
     async cargar() {
         const tbody = document.querySelector('#tablaEmpleados tbody');
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">Cargando...</td></tr>';
 
-        // Poblar filtro de sucursales
-        await Sucursales.poblarSelect('filtroSucursal', '— Todas las sucursales —');
-
-        const res = await API.getEmpleados();
-        if (!res.success) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:red">Error al cargar empleados</td></tr>';
-            return;
+        if (App.sucursales.length === 0) {
+            const rs = await API.getSucursales();
+            if (rs.success) App.sucursales = rs.data;
         }
 
-        this.lista = res.data;
-        this._render(this.lista);
+        const filtro = document.getElementById('filtroSucursal');
+        filtro.innerHTML = '<option value="">— Todas las sucursales —</option>';
+        App.sucursales.forEach(s => {
+            filtro.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
+        });
+
+        const response = await API.getEmpleados();
+        if (response.success) {
+            App.empleados = response.data;
+            Empleados.renderizar(App.empleados);
+        } else {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:red">Error al cargar empleados</td></tr>';
+        }
     },
 
-    /**
-     * Renderiza una lista de empleados, resaltando opcionalmente un término.
-     */
-    _render(lista, termino = '') {
+    renderizar(lista, termino = '') {
         const tbody = document.querySelector('#tablaEmpleados tbody');
-
+        tbody.innerHTML = '';
         if (lista.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888">No se encontraron empleados.</td></tr>';
             document.getElementById('resultadosCount').textContent = '';
             return;
         }
-
-        tbody.innerHTML = lista.map(e => {
-            const nombreMostrado = termino
-                ? this._resaltar(e.nombre, termino)
-                : e.nombre;
-
-            return `
+        lista.forEach(e => {
+            const nombreMostrado = termino ? resaltarTexto(e.nombre, termino) : e.nombre;
+            tbody.innerHTML += `
                 <tr>
                     <td>${e.id}</td>
                     <td>${nombreMostrado}</td>
@@ -52,139 +44,113 @@ const Empleados = {
                     <td>${e.sucursal_nombre || 'N/A'}</td>
                     <td>${e.fecha_ingreso || '-'}</td>
                     <td class="actions">
-                        <button class="btn btn-warning" onclick="Empleados.abrirModal(${e.id})">✏️ Editar</button>
-                        <button class="btn btn-danger"  onclick="Empleados.eliminar(${e.id})">🗑️ Eliminar</button>
+                        <button class="btn btn-warning" onclick="Empleados.editar(${e.id})">✏️ Editar</button>
+                        <button class="btn btn-danger" onclick="Empleados.eliminar(${e.id})">🗑️ Eliminar</button>
                     </td>
                 </tr>`;
-        }).join('');
-
-        const total     = this.lista.length;
+        });
+        const total = App.empleados.length;
         const mostrando = lista.length;
         document.getElementById('resultadosCount').textContent =
-            mostrando < total
-                ? `Mostrando ${mostrando} de ${total} empleados`
-                : `${total} empleado${total !== 1 ? 's' : ''}`;
+            mostrando < total ? `Mostrando ${mostrando} de ${total} empleados` : `${total} empleado${total !== 1 ? 's' : ''}`;
     },
-
-    /**
-     * Envuelve las coincidencias del término con <span class="highlight">.
-     */
-    _resaltar(texto, termino) {
-        const regex = new RegExp(
-            `(${termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`,
-            'gi'
-        );
-        return texto.replace(regex, '<span class="highlight">$1</span>');
-    },
-
-    // ── Filtrado ────────────────────────────────────────────────
 
     filtrar() {
-        const termino    = document.getElementById('buscarEmpleado').value.trim().toLowerCase();
+        const termino = document.getElementById('buscarEmpleado').value.trim().toLowerCase();
         const sucursalId = document.getElementById('filtroSucursal').value;
-
-        const resultado = this.lista.filter(e => {
-            const coincideNombre   = !termino    || e.nombre.toLowerCase().includes(termino);
+        const resultado = App.empleados.filter(e => {
+            const coincideNombre = !termino || e.nombre.toLowerCase().includes(termino);
             const coincideSucursal = !sucursalId || String(e.sucursal_id) === sucursalId;
             return coincideNombre && coincideSucursal;
         });
-
-        this._render(resultado, termino);
+        Empleados.renderizar(resultado, termino);
     },
 
-    // ── Modal ───────────────────────────────────────────────────
-
     async abrirModal(id = null) {
+        document.getElementById('modalEmpleado').classList.add('active');
         document.getElementById('formEmpleado').reset();
         document.getElementById('empleadoId').value = '';
         document.getElementById('tituloModalEmpleado').textContent = 'Nuevo Empleado';
 
-        // Poblar select de sucursales dentro del modal
-        await Sucursales.poblarSelect('empleadoSucursal', '-- Seleccione --');
+        const select = document.getElementById('empleadoSucursal');
+        select.innerHTML = '<option value="">-- Cargando sucursales... --</option>';
+        if (App.sucursales.length === 0) {
+            const response = await API.getSucursales();
+            if (response.success) App.sucursales = response.data;
+        }
+        select.innerHTML = '<option value="">-- Seleccione --</option>';
+        App.sucursales.forEach(s => {
+            select.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
+        });
 
-        if (id !== null) {
-            // FIX 1: si la lista aún no cargó, buscar directo en la caché de Sucursales
-            // o forzar recarga para garantizar que el dato existe
-            let emp = this.lista.find(x => x.id == id);
-            if (!emp) {
-                const res = await API.getEmpleados();
-                if (res.success) {
-                    this.lista = res.data;
-                    emp = this.lista.find(x => x.id == id);
-                }
-            }
-            if (emp) {
-                document.getElementById('empleadoId').value       = emp.id;
-                document.getElementById('empleadoNombre').value   = emp.nombre;
-                document.getElementById('empleadoSueldo').value   = emp.sueldo_base;
-                document.getElementById('empleadoSucursal').value = emp.sucursal_id;
-                // FIX 3: fecha vacía → string vacío es aceptable para <input type="date">,
-                // pero normalizamos a '' explícitamente para evitar "null" como texto
-                document.getElementById('empleadoFecha').value    = emp.fecha_ingreso ?? '';
+        if (id) {
+            const e = App.empleados.find(x => x.id == id);
+            if (e) {
+                document.getElementById('empleadoId').value = e.id;
+                document.getElementById('empleadoNombre').value = e.nombre;
+                document.getElementById('empleadoSueldo').value = e.sueldo_base;
+                document.getElementById('empleadoSucursal').value = e.sucursal_id;
+                document.getElementById('empleadoFecha').value = e.fecha_ingreso || '';
                 document.getElementById('tituloModalEmpleado').textContent = 'Editar Empleado';
             }
         }
-
-        document.getElementById('modalEmpleado').classList.add('active');
     },
 
     cerrarModal() {
         document.getElementById('modalEmpleado').classList.remove('active');
     },
 
-    // ── CRUD ────────────────────────────────────────────────────
-
     async guardar(e) {
         e.preventDefault();
-
-        const id         = document.getElementById('empleadoId').value;
-        const nombre     = document.getElementById('empleadoNombre').value.trim();
-        const sueldo     = parseFloat(document.getElementById('empleadoSueldo').value);
-        const sucursalId = document.getElementById('empleadoSucursal').value;
-        const fecha      = document.getElementById('empleadoFecha').value;
-
-        // FIX 2: validar sucursal antes de parsear (parseInt('') → NaN)
-        if (!sucursalId) {
-            alert('Debe seleccionar una sucursal.');
-            return;
-        }
-
-        // FIX 4: validar sueldo positivo
-        if (isNaN(sueldo) || sueldo <= 0) {
-            alert('El sueldo base debe ser mayor a 0.');
-            return;
-        }
-
+        const id = document.getElementById('empleadoId').value;
         const data = {
-            nombre,
-            sueldo_base:   sueldo,
-            sucursal_id:   parseInt(sucursalId),
-            // FIX 3: enviar null al servidor si no hay fecha, no string vacío
-            fecha_ingreso: fecha || null,
+            nombre: document.getElementById('empleadoNombre').value,
+            sueldo_base: parseFloat(document.getElementById('empleadoSueldo').value),
+            sucursal_id: parseInt(document.getElementById('empleadoSucursal').value),
+            fecha_ingreso: document.getElementById('empleadoFecha').value
         };
-
-        const res = id
-            ? await API.updateEmpleado({ ...data, id: parseInt(id) })
-            : await API.createEmpleado(data);
-
-        if (res.success) {
-            alert('Empleado guardado correctamente');
-            this.cerrarModal();
-            await this.cargar();
+        let response;
+        if (id) {
+            data.id = parseInt(id);
+            response = await API.updateEmpleado(data);
         } else {
-            alert('Error: ' + res.message);
+            response = await API.createEmpleado(data);
+        }
+        if (response.success) {
+            alert('Empleado guardado correctamente');
+            Empleados.cerrarModal();
+            Empleados.cargar();
+        } else {
+            alert('Error: ' + response.message);
         }
     },
+
+    editar(id) { Empleados.abrirModal(id); },
 
     async eliminar(id) {
-        if (!confirm('¿Está seguro de eliminar este empleado?')) return;
-
-        const res = await API.deleteEmpleado(id);
-        if (res.success) {
-            alert('Empleado eliminado correctamente');
-            await this.cargar();
-        } else {
-            alert('Error: ' + res.message);
+        if (confirm('¿Está seguro de eliminar este empleado?')) {
+            const response = await API.deleteEmpleado(id);
+            if (response.success) {
+                alert('Empleado eliminado correctamente');
+                Empleados.cargar();
+            } else {
+                alert('Error: ' + response.message);
+            }
         }
-    },
+    }
 };
+
+// Helpers globales
+function resaltarTexto(texto, termino) {
+    if (!termino) return texto;
+    const regex = new RegExp(`(${termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return texto.replace(regex, '<span class="highlight">$1</span>');
+}
+
+// Puentes para onclick antiguos
+function openEmpleadoModal(id) { Empleados.abrirModal(id); }
+function closeEmpleadoModal() { Empleados.cerrarModal(); }
+function guardarEmpleado(e) { Empleados.guardar(e); }
+function editarEmpleado(id) { Empleados.editar(id); }
+function eliminarEmpleado(id) { Empleados.eliminar(id); }
+function filtrarEmpleados() { Empleados.filtrar(); }

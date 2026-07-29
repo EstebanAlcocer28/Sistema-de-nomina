@@ -289,6 +289,11 @@ tr:hover { background: #FFF0F0; }
     min-width: 200px;
 }
 
+/* Regla agregada: alinear botón "Nuevo Empleado" con los inputs */
+.empleados-toolbar .btn-add {
+    margin-bottom: 1px;
+}
+
 .search-wrapper { position: relative; }
 
 .search-wrapper input { padding-left: 36px; }
@@ -316,4 +321,9 @@ tr:hover { background: #FFF0F0; }
     padding: 0 2px;
     font-weight: 600;
     color: #B30000;
+}
+
+/* Regla agregada: ocultar filas (útil para filtros futuros) */
+tr.hidden-row {
+    display: none;
 }
