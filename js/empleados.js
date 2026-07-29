@@ -34,12 +34,12 @@ const Empleados = {
             document.getElementById('resultadosCount').textContent = '';
             return;
         }
-        lista.forEach(e => {
+        lista.forEach((e, index) => {
             const nombreMostrado = termino ? resaltarTexto(e.nombre, termino) : e.nombre;
             tbody.innerHTML += `
-                <tr>
-                    <td>${e.id}</td>
-                    <td>${nombreMostrado}</td>
+        <tr>
+            <td>${index + 1}</td>
+            <td>${nombreMostrado}</td>
                     <td>$${parseFloat(e.sueldo_base).toFixed(2)}</td>
                     <td>${e.sucursal_nombre || 'N/A'}</td>
                     <td>${e.fecha_ingreso || '-'}</td>
