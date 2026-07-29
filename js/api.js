@@ -5,10 +5,9 @@
 const API = {
     async request(action, method = 'GET', data = null, params = {}) {
         try {
-            const url = new URL('api.php', window.location.origin);
+            const url = new URL('api.php', window.location.href);
             url.searchParams.set('action', action);
             Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-
             const options = {
                 method,
                 headers: { 'Content-Type': 'application/json' }

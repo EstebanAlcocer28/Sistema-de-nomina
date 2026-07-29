@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eden - Sistema de Nómina</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
@@ -176,11 +176,11 @@
         </div>
     </div>
 
-    <script src="/js/api.js"></script>
-    <script src="/js/app.js"></script>
-    <script src="/js/sucursales.js"></script>
-    <script src="/js/empleados.js"></script>
-    <script src="/js/nomina.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/sucursales.js"></script>
+    <script src="js/empleados.js"></script>
+    <script src="js/nomina.js"></script>
 
 </body>
 
