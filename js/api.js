@@ -31,12 +31,14 @@ const API = {
     getSucursales:           ()   => API.request('getSucursales'),
     createSucursal:          (d)  => API.request('createSucursal', 'POST', d),
     updateSucursal:          (d)  => API.request('updateSucursal', 'POST', d),
-    deleteSucursal:          (id) => API.request('deleteSucursal', 'POST', {}, { id }),
+    // CORREGIDO: enviar el id en el cuerpo JSON
+    deleteSucursal:          (id) => API.request('deleteSucursal', 'POST', { id }),
 
     // ── Empleados ─────────────────────────────────────
     getEmpleados:            ()   => API.request('getEmpleados'),
     createEmpleado:          (d)  => API.request('createEmpleado', 'POST', d),
     updateEmpleado:          (d)  => API.request('updateEmpleado', 'POST', d),
-    deleteEmpleado:          (id) => API.request('deleteEmpleado', 'POST', {}, { id }),
+    // CORREGIDO: enviar el id en el cuerpo JSON
+    deleteEmpleado:          (id) => API.request('deleteEmpleado', 'POST', { id }),
     getEmpleadosBySucursal:  (id) => API.request('getEmpleadosBySucursal', 'GET', null, { sucursal_id: id })
 };

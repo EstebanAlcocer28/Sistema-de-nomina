@@ -123,7 +123,7 @@ switch ($action) {
         $id = validarId($data['id'] ?? 0);
 
         // Verificar empleados vinculados (consulta preparada)
-        $stmtCheck = $conn->prepare("SELECT COUNT(*) as total FROM empleados WHERE sucursal_id = ?");
+        $stmtCheck = $conn->prepare("SELECT COUNT(*) as total FROM empleados WHERE sucursal_id = ? AND activo = 1");
         if (!$stmtCheck) {
             error_log('Error preparando verificación deleteSucursal: ' . $conn->error);
             echo json_encode(['success' => false, 'message' => 'Error interno']);
@@ -138,7 +138,7 @@ switch ($action) {
         if ($count > 0) {
             echo json_encode([
                 'success' => false,
-                'message' => 'No se puede eliminar. La sucursal tiene empleados asignados.'
+                'message' => 'No se puede eliminar. La sucursal tiene empleados activos asignados.'
             ]);
         } else {
             $result = executeQuery($conn, "DELETE FROM sucursales WHERE id = ?", 'i', [$id]);
@@ -212,7 +212,7 @@ switch ($action) {
             break;
         }
         $result = executeQuery($conn,
-            "INSERT INTO empleados (nombre, sueldo_base, sucursal_id, fecha_ingreso) VALUES (?, ?, ?, ?)",
+            "INSERT INTO empleados (nombre, sueldo_base, sucursal_id, fecha_ingreso, activo) VALUES (?, ?, ?, ?, 1)",
             'sdis', [$nombre, $sueldo_base, $sucursal_id, $fecha_ingreso]
         );
         echo json_encode($result);
@@ -243,13 +243,14 @@ switch ($action) {
             break;
         }
         $result = executeQuery($conn,
-            "UPDATE empleados SET nombre = ?, sueldo_base = ?, sucursal_id = ?, fecha_ingreso = ? WHERE id = ?",
+            "UPDATE empleados SET nombre = ?, sueldo_base = ?, sucursal_id = ?, fecha_ingreso = ? WHERE id = ? AND activo = 1",
             'sdisi', [$nombre, $sueldo_base, $sucursal_id, $fecha_ingreso, $id]
         );
         echo json_encode($result);
         break;
 
     case 'deleteEmpleado':
+        // Soft delete: desactiva al empleado en lugar de borrarlo físicamente
         if ($method !== 'POST') {
             http_response_code(405);
             echo json_encode(['success' => false, 'message' => 'Método no permitido (use POST)']);
@@ -257,8 +258,7 @@ switch ($action) {
         }
         $data = getJsonInput();
         $id = validarId($data['id'] ?? 0);
-        // Borrado físico (hard delete)
-        $result = executeQuery($conn, "DELETE FROM empleados WHERE id = ?", 'i', [$id]);
+        $result = executeQuery($conn, "UPDATE empleados SET activo = 0 WHERE id = ?", 'i', [$id]);
         echo json_encode($result);
         break;
 

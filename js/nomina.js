@@ -34,6 +34,7 @@ const Nomina = {
             <table id="tablaNomina">
                 <thead>
                     <tr>
+                        <th>No.</th>
                         <th>Empleado</th>
                         <th>Sueldo Base</th>
                         <th>Días (Asist.)</th>
@@ -48,10 +49,11 @@ const Nomina = {
                 </thead>
                 <tbody>`;
 
-        empleadosSucursal.forEach(e => {
+        empleadosSucursal.forEach((e, index) => {
             const sueldoBase = Number(e.sueldo_base) || 0;
             html += `
                 <tr data-empleado-id="${e.id}" data-sueldo="${sueldoBase}">
+                    <td>${index + 1}</td>
                     <td>${e.nombre}</td>
                     <td>$${sueldoBase.toFixed(2)}</td>
                     <td><input type="number" class="input-small dias" min="0" max="12" value="7" onchange="Nomina.calcularTotal(this)"></td>

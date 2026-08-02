@@ -74,19 +74,20 @@ $pdf->SetFont('helvetica', '', 12);
 $pdf->Cell(0, 8, date('d/m/Y'), 0, 1, 'L', true);
 $pdf->Ln(5);
 
-// ── TABLA ─────────────────────────────────────────────────────
-$anchos = [35, 18, 10, 16, 16, 14, 16, 14, 18, 23];
+// ── TABLA (con nueva columna de índice) ───────────────────────
+// Nuevo arreglo de anchos: #, Empleado, Sueldo, Días, Sanciones, Préstamo, Extra, Adelanto, Faltante, Pago Tarjeta, Total Efectivo
+$anchos = [8, 30, 16, 8, 16, 16, 13, 16, 13, 18, 22];
 $totalWidth = array_sum($anchos);
 $pageWidth  = $pdf->getPageWidth();
 $margins    = $pdf->getMargins();
 $leftMargin = max(($pageWidth - $totalWidth) / 2, $margins['left']);
 $pdf->SetX($leftMargin);
 
-// Cabecera de tabla
+// Cabecera de tabla (ahora con "#")
 $pdf->SetFillColor($colorRojo[0], $colorRojo[1], $colorRojo[2]);
 $pdf->SetTextColor(255, 255, 255);
 $pdf->SetFont('helvetica', 'B', 8);
-$headers = ['Empleado', 'Sueldo', 'Días', 'Sanciones', 'Préstamo', 'Extra', 'Adelanto', 'Faltante', 'Pago Tarjeta', 'Total Efectivo'];
+$headers = ['#', 'Empleado', 'Sueldo', 'Días', 'Sanciones', 'Préstamo', 'Extra', 'Adelanto', 'Faltante', 'Pago Tarjeta', 'Total Efectivo'];
 foreach ($headers as $i => $h) {
     $pdf->Cell($anchos[$i], 8, $h, 1, 0, 'C', true);
 }
@@ -97,6 +98,7 @@ $pdf->SetTextColor(0, 0, 0);
 
 $totalGeneral = 0;
 $fill = false;
+$contador = 0;  // Contador de empleados procesados
 
 // ── Procesamiento de cada empleado ────────────────────────────
 foreach ($datos as $empleado) {
@@ -104,6 +106,8 @@ foreach ($datos as $empleado) {
     if (!isset($empleado['nombre'], $empleado['sueldo_base'])) {
         continue; // omitir registros incompletos
     }
+
+    $contador++; // Aumentamos el índice
 
     // 1. Sanitización del nombre
     $nombre = sanitizar($empleado['nombre'], 25);
@@ -118,16 +122,16 @@ foreach ($datos as $empleado) {
     $faltante   = max(0, floatval($empleado['faltante'] ?? 0));
     $tarjeta    = max(0, floatval($empleado['tarjeta'] ?? 0));
 
-    // 3. RECÁLCULO DEL TOTAL en el servidor (ignora el total enviado)
+    // 3. RECÁLCULO DEL TOTAL en el servidor
     $pagoDiario     = $sueldoBase / 7;
     $pagoAsistencia = $pagoDiario * $dias;
     $totalSanciones = $sanciones * 100;
     $total = ($pagoAsistencia - $totalSanciones - $prestamo - $adelanto - $tarjeta - $faltante) + $extra;
-    $total = round($total, 2); // redondeo a centavos
+    $total = round($total, 2);
 
     $totalGeneral += $total;
 
-    // Fila
+    // Fila con alternancia de color
     if ($fill) {
         $pdf->SetFillColor($colorRojoClaro[0], $colorRojoClaro[1], $colorRojoClaro[2]);
     } else {
@@ -135,19 +139,22 @@ foreach ($datos as $empleado) {
     }
     $pdf->SetX($leftMargin);
 
-    $pdf->Cell($anchos[0], 7, $nombre, 1, 0, 'L', true);
-    $pdf->Cell($anchos[1], 7, '$' . number_format($sueldoBase, 2), 1, 0, 'R', true);
-    $pdf->Cell($anchos[2], 7, $dias, 1, 0, 'C', true);
-    $pdf->Cell($anchos[3], 7, $sanciones . ' (-$' . number_format($totalSanciones, 0) . ')', 1, 0, 'C', true);
-    $pdf->Cell($anchos[4], 7, '$' . number_format($prestamo, 2), 1, 0, 'R', true);
-    $pdf->Cell($anchos[5], 7, '$' . number_format($extra, 2), 1, 0, 'R', true);
-    $pdf->Cell($anchos[6], 7, '$' . number_format($adelanto, 2), 1, 0, 'R', true);
-    $pdf->Cell($anchos[7], 7, '$' . number_format($faltante, 2), 1, 0, 'R', true);
-    $pdf->Cell($anchos[8], 7, '$' . number_format($tarjeta, 2), 1, 0, 'R', true);
+    // Índice
+    $pdf->Cell($anchos[0], 7, $contador, 1, 0, 'C', true);
+    // Resto de columnas
+    $pdf->Cell($anchos[1], 7, $nombre, 1, 0, 'L', true);
+    $pdf->Cell($anchos[2], 7, '$' . number_format($sueldoBase, 2), 1, 0, 'R', true);
+    $pdf->Cell($anchos[3], 7, $dias, 1, 0, 'C', true);
+    $pdf->Cell($anchos[4], 7, $sanciones . ' (-$' . number_format($totalSanciones, 0) . ')', 1, 0, 'C', true);
+    $pdf->Cell($anchos[5], 7, '$' . number_format($prestamo, 2), 1, 0, 'R', true);
+    $pdf->Cell($anchos[6], 7, '$' . number_format($extra, 2), 1, 0, 'R', true);
+    $pdf->Cell($anchos[7], 7, '$' . number_format($adelanto, 2), 1, 0, 'R', true);
+    $pdf->Cell($anchos[8], 7, '$' . number_format($faltante, 2), 1, 0, 'R', true);
+    $pdf->Cell($anchos[9], 7, '$' . number_format($tarjeta, 2), 1, 0, 'R', true);
 
     $pdf->SetFont('helvetica', 'B', 8);
     $pdf->SetFillColor($colorRojoClaro[0], $colorRojoClaro[1], $colorRojoClaro[2]);
-    $pdf->Cell($anchos[9], 7, '$' . number_format($total, 2), 1, 0, 'R', true);
+    $pdf->Cell($anchos[10], 7, '$' . number_format($total, 2), 1, 0, 'R', true);
     $pdf->SetFont('helvetica', '', 8);
 
     $pdf->Ln();
@@ -159,13 +166,21 @@ $pdf->SetX($leftMargin);
 $pdf->SetFont('helvetica', 'B', 9);
 $pdf->SetFillColor($colorRojo[0], $colorRojo[1], $colorRojo[2]);
 $pdf->SetTextColor(255, 255, 255);
-$anchoPrevio = array_sum(array_slice($anchos, 0, 9));
+// Ancho previo ahora son las primeras 10 columnas (0 a 9)
+$anchoPrevio = array_sum(array_slice($anchos, 0, 10));
 $pdf->Cell($anchoPrevio, 8, 'TOTAL GENERAL A PAGAR:', 1, 0, 'R', true);
-$pdf->Cell($anchos[9], 8, '$' . number_format($totalGeneral, 2), 1, 0, 'R', true);
+$pdf->Cell($anchos[10], 8, '$' . number_format($totalGeneral, 2), 1, 0, 'R', true);
 $pdf->Ln();
 
+// ── CANTIDAD DE EMPLEADOS ─────────────────────────────────────
+$pdf->Ln(2);
+$pdf->SetTextColor(0, 0, 0);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetX($leftMargin);
+$pdf->Cell($totalWidth, 7, 'Total de empleados procesados: ' . $contador, 0, 1, 'R');
+
 // ── PIE DE PÁGINA ────────────────────────────────────────────
-$pdf->Ln(10);
+$pdf->Ln(8);
 $pdf->SetTextColor(100, 100, 100);
 $pdf->SetFont('helvetica', 'I', 8);
 $pdf->Cell(0, 5, 'Carniceria Eden ' . date('d/m/Y H:i:s'), 0, 1, 'C');
