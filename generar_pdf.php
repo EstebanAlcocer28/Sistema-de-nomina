@@ -114,7 +114,7 @@ foreach ($datos as $empleado) {
 
     // 2. Validación y conversión de valores numéricos
     $sueldoBase = max(0, floatval($empleado['sueldo_base']));
-    $dias = max(0, intval($empleado['dias'] ?? 7));// rango 0-7
+    $dias = max(0, intval($empleado['dias'] ?? 7));
     $sanciones  = max(0, intval($empleado['sanciones'] ?? 0));
     $prestamo   = max(0, floatval($empleado['prestamo'] ?? 0));
     $extra      = max(0, floatval($empleado['extra'] ?? 0));
