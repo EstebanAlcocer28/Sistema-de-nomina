@@ -327,3 +327,95 @@ tr:hover { background: #FFF0F0; }
 tr.hidden-row {
     display: none;
 }
+/* --- Tabla de nómina --- */
+#tablaNomina {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+#tablaNomina th,
+#tablaNomina td {
+    padding: 6px 8px;
+    border: 1px solid #dcdcdc;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#tablaNomina thead th {
+    background-color: #2c3e50;
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Columnas de los días: resaltadas con ancho fijo */
+#tablaNomina th.th-dia,
+#tablaNomina td.td-dia {
+    width: 42px;
+    min-width: 42px;
+    max-width: 42px;
+    padding: 4px;
+    background-color: #f4f6f8;
+}
+
+/* Columna del nombre del empleado */
+#tablaNomina td.td-empleado {
+    text-align: left;
+    min-width: 180px;
+}
+
+/* Input del día */
+#tablaNomina .dia-input {
+    width: 100%;
+    height: 30px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.15s ease;
+}
+
+#tablaNomina .dia-input:focus {
+    border-color: #2c3e50;
+    box-shadow: 0 0 4px rgba(44, 62, 80, 0.4);
+}
+
+/* Estado A = Asistió */
+#tablaNomina .dia-input.estado-A {
+    background-color: #d4f5d4;
+    border-color: #28a745;
+    color: #155724;
+}
+
+/* Estado D = Descanso / Falta */
+#tablaNomina .dia-input.estado-D {
+    background-color: #fde2e2;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+/* Celda de asistencia */
+#tablaNomina .celda-asistencia {
+    font-weight: bold;
+    font-size: 15px;
+    color: #155724;
+    background-color: #eaf7ee;
+}
+
+/* Inputs numéricos pequeños */
+#tablaNomina .input-small {
+    width: 75px;
+    padding: 4px 6px;
+    text-align: right;
+}
+
+#tablaNomina .total-pagar[readonly] {
+    background-color: #f1f1f1;
+    font-weight: bold;
+    color: #0b5ed7;
+}
